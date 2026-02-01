@@ -1,0 +1,1905 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive ATM for Visually Impaired</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* CSS Reset & Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Roboto', sans-serif;
+        }
+
+        :root {
+            --primary: #2a5c8d;
+            --primary-dark: #1a3a5c;
+            --secondary: #4CAF50;
+            --secondary-dark: #3d8b40;
+            --danger: #f44336;
+            --warning: #ff9800;
+            --light: #f5f7fa;
+            --dark: #222;
+            --gray: #666;
+            --border-radius: 12px;
+            --transition: all 0.3s ease;
+            --shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            --shadow-heavy: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        body {
+            background: linear-gradient(135deg, #1a237e 0%, #283593 100%);
+            color: var(--dark);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            transition: var(--transition);
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        /* ATM Machine Container */
+        .atm-machine {
+            background: linear-gradient(to bottom, #d1d8e0 0%, #a5b1c2 100%);
+            border-radius: 25px;
+            padding: 25px;
+            box-shadow: var(--shadow-heavy);
+            border: 8px solid #3a506b;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* ATM Screen */
+        .atm-screen {
+            background: linear-gradient(145deg, #0f2027, #203a43);
+            border-radius: var(--border-radius);
+            padding: 25px;
+            margin-bottom: 25px;
+            color: #fff;
+            min-height: 450px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.5);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .screen-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .atm-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .atm-logo i {
+            color: #4FC3F7;
+            font-size: 24px;
+        }
+
+        .atm-logo h1 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #fff;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .status-bar {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-size: 0.9rem;
+            color: #b0bec5;
+        }
+
+        .current-time {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 5px 10px;
+            border-radius: 20px;
+        }
+
+        .screen-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px 0;
+            transition: var(--transition);
+        }
+
+        /* Welcome Screen */
+        .welcome-screen {
+            text-align: center;
+        }
+
+        .welcome-icon {
+            font-size: 4rem;
+            color: #4FC3F7;
+            margin-bottom: 20px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .welcome-screen h2 {
+            font-size: 2.2rem;
+            margin-bottom: 15px;
+            color: #fff;
+            text-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+        }
+
+        .welcome-screen p {
+            font-size: 1.2rem;
+            color: #b0bec5;
+            margin-bottom: 30px;
+            max-width: 600px;
+            line-height: 1.5;
+        }
+
+        /* Keypad */
+        .keypad-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            max-width: 350px;
+            margin: 0 auto;
+        }
+
+        .keypad-btn {
+            background: linear-gradient(145deg, #37474f, #263238);
+            color: white;
+            border: none;
+            border-radius: var(--border-radius);
+            font-size: 1.8rem;
+            font-weight: bold;
+            padding: 20px 10px;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .keypad-btn:hover, .keypad-btn:focus {
+            background: linear-gradient(145deg, #455a64, #37474f);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+            outline: none;
+        }
+
+        .keypad-btn:active {
+            transform: translateY(1px);
+        }
+
+        .keypad-btn.clear {
+            background: linear-gradient(145deg, #ff7043, #f4511e);
+        }
+
+        .keypad-btn.backspace {
+            background: linear-gradient(145deg, #ff9800, #f57c00);
+        }
+
+        .keypad-btn.confirm {
+            background: linear-gradient(145deg, #4CAF50, #2e7d32);
+            grid-column: span 2;
+        }
+
+        /* PIN Display */
+        .pin-display {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .pin-dot {
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            background: #455a64;
+            transition: var(--transition);
+        }
+
+        .pin-dot.filled {
+            background: #4FC3F7;
+            box-shadow: 0 0 10px #4FC3F7;
+        }
+
+        /* Menu */
+        .menu-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            width: 100%;
+            max-width: 600px;
+        }
+
+        .menu-btn {
+            background: linear-gradient(145deg, rgba(79, 195, 247, 0.2), rgba(33, 150, 243, 0.1));
+            border: 2px solid rgba(79, 195, 247, 0.3);
+            border-radius: var(--border-radius);
+            padding: 25px 15px;
+            color: white;
+            font-size: 1.3rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        .menu-btn i {
+            font-size: 2.2rem;
+            color: #4FC3F7;
+        }
+
+        .menu-btn:hover, .menu-btn:focus {
+            background: linear-gradient(145deg, rgba(79, 195, 247, 0.4), rgba(33, 150, 243, 0.3));
+            border-color: #4FC3F7;
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+            outline: none;
+        }
+
+        /* Transaction Screens */
+        .transaction-screen {
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .transaction-screen h3 {
+            font-size: 1.8rem;
+            margin-bottom: 25px;
+            text-align: center;
+            color: #4FC3F7;
+        }
+
+        .amount-buttons {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .amount-btn {
+            background: linear-gradient(145deg, #37474f, #263238);
+            border: none;
+            border-radius: var(--border-radius);
+            color: white;
+            font-size: 1.3rem;
+            font-weight: 600;
+            padding: 20px 10px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .amount-btn:hover, .amount-btn:focus {
+            background: linear-gradient(145deg, #4CAF50, #2e7d32);
+            transform: translateY(-3px);
+            outline: none;
+        }
+
+        .amount-input-container {
+            margin-bottom: 25px;
+        }
+
+        .amount-input {
+            width: 100%;
+            padding: 20px;
+            font-size: 1.8rem;
+            text-align: center;
+            background: rgba(0, 0, 0, 0.3);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: var(--border-radius);
+            color: white;
+            margin-bottom: 15px;
+        }
+
+        .amount-input:focus {
+            border-color: #4FC3F7;
+            outline: none;
+        }
+
+        .transaction-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        .action-btn {
+            padding: 15px 30px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            border: none;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: var(--transition);
+            min-width: 150px;
+        }
+
+        .action-btn.confirm {
+            background: linear-gradient(145deg, #4CAF50, #2e7d32);
+            color: white;
+        }
+
+        .action-btn.cancel {
+            background: linear-gradient(145deg, #f44336, #d32f2f);
+            color: white;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Balance Display */
+        .balance-display {
+            text-align: center;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: var(--border-radius);
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+
+        .balance-amount {
+            font-size: 4rem;
+            font-weight: 700;
+            color: #4FC3F7;
+            text-shadow: 0 0 10px rgba(79, 195, 247, 0.5);
+            margin: 20px 0;
+        }
+
+        .currency {
+            font-size: 2rem;
+            color: #b0bec5;
+            vertical-align: top;
+        }
+
+        /* Transaction History */
+        .transaction-history {
+            width: 100%;
+            max-height: 300px;
+            overflow-y: auto;
+            margin-bottom: 25px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: var(--border-radius);
+            padding: 15px;
+        }
+
+        .transaction-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 15px;
+            margin-bottom: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            border-left: 4px solid #4FC3F7;
+        }
+
+        .transaction-type {
+            font-weight: 600;
+            color: #4FC3F7;
+        }
+
+        .transaction-amount {
+            font-weight: 700;
+        }
+
+        .transaction-date {
+            font-size: 0.9rem;
+            color: #b0bec5;
+        }
+
+        /* Accessibility Controls */
+        .accessibility-controls {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .accessibility-btn {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            color: white;
+            padding: 10px 20px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .accessibility-btn:hover, .accessibility-btn:focus {
+            background: rgba(79, 195, 247, 0.2);
+            border-color: #4FC3F7;
+            outline: none;
+        }
+
+        .accessibility-btn.active {
+            background: rgba(79, 195, 247, 0.4);
+            border-color: #4FC3F7;
+        }
+
+        /* ATM Buttons (Physical Buttons) */
+        .atm-buttons {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 25px;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.1);
+            border-radius: var(--border-radius);
+        }
+
+        .physical-btn {
+            background: linear-gradient(145deg, #3a506b, #1c2d3f);
+            border: none;
+            border-radius: 50%;
+            width: 70px;
+            height: 70px;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            transition: var(--transition);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .physical-btn:hover, .physical-btn:focus {
+            background: linear-gradient(145deg, #4a6488, #2c3e50);
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+            outline: none;
+        }
+
+        .physical-btn:active {
+            transform: translateY(0);
+        }
+
+        /* High Contrast Mode */
+        .high-contrast {
+            background: #000 !important;
+            color: #fff !important;
+            border-color: #fff !important;
+        }
+
+        .high-contrast .atm-screen {
+            background: #000 !important;
+            color: #fff !important;
+        }
+
+        .high-contrast .keypad-btn {
+            background: #fff !important;
+            color: #000 !important;
+        }
+
+        .high-contrast .menu-btn {
+            background: #fff !important;
+            color: #000 !important;
+            border-color: #000 !important;
+        }
+
+        .high-contrast .menu-btn i {
+            color: #000 !important;
+        }
+
+        /* Large Font Mode */
+        .large-font {
+            font-size: 1.2rem !important;
+        }
+
+        .large-font .menu-btn {
+            font-size: 1.5rem !important;
+        }
+
+        .large-font .keypad-btn {
+            font-size: 2.2rem !important;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .atm-machine {
+                padding: 15px;
+            }
+            
+            .menu-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .amount-buttons {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .balance-amount {
+                font-size: 3rem;
+            }
+            
+            .welcome-screen h2 {
+                font-size: 1.8rem;
+            }
+            
+            .accessibility-controls {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .keypad-container {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 10px;
+            }
+            
+            .keypad-btn {
+                padding: 15px 5px;
+                font-size: 1.5rem;
+            }
+            
+            .physical-btn {
+                width: 60px;
+                height: 60px;
+            }
+            
+            .atm-buttons {
+                padding: 15px;
+            }
+        }
+
+        /* Utility Classes */
+        .hidden {
+            display: none !important;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .mb-20 {
+            margin-bottom: 20px;
+        }
+
+        .mt-20 {
+            margin-top: 20px;
+        }
+
+        .status {
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .status-success {
+            background: rgba(76, 175, 80, 0.2);
+            color: #4CAF50;
+        }
+
+        .status-error {
+            background: rgba(244, 67, 54, 0.2);
+            color: #f44336;
+        }
+
+        .status-info {
+            background: rgba(79, 195, 247, 0.2);
+            color: #4FC3F7;
+        }
+
+        /* Focus styles for accessibility */
+        button:focus, input:focus {
+            outline: 3px solid #4FC3F7;
+            outline-offset: 2px;
+        }
+
+        /* Speech indicator */
+        .speech-indicator {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            color: #4FC3F7;
+        }
+
+        .speech-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #4FC3F7;
+            animation: speechPulse 1.5s infinite;
+        }
+
+        @keyframes speechPulse {
+            0% { opacity: 0.3; }
+            50% { opacity: 1; }
+            100% { opacity: 0.3; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="atm-machine" id="atmMachine">
+            <!-- ATM Screen -->
+            <div class="atm-screen" id="atmScreen">
+                <div class="screen-header">
+                    <div class="atm-logo">
+                        <i class="fas fa-university"></i>
+                        <h1>AccessiBank ATM</h1>
+                    </div>
+                    <div class="status-bar">
+                        <div class="current-time" id="currentTime">12:00 PM</div>
+                        <div class="status status-success" id="statusIndicator">Online</div>
+                    </div>
+                </div>
+                
+                <!-- Speech Indicator -->
+                <div class="speech-indicator" id="speechIndicator">
+                    <div class="speech-dot"></div>
+                    <span>Voice Active</span>
+                </div>
+                
+                <!-- Screen Content (changes based on state) -->
+                <div class="screen-content" id="screenContent">
+                    <!-- Welcome Screen (default) -->
+                    <div class="welcome-screen" id="welcomeScreen">
+                        <div class="welcome-icon">
+                            <i class="fas fa-hand-holding-usd"></i>
+                        </div>
+                        <h2>Welcome to AccessiBank</h2>
+                        <p>Designed for accessibility. Insert your card to begin, or use keyboard navigation (Tab, Enter, Arrow keys).</p>
+                        <div class="mb-20">
+                            <div class="status status-info">Voice guidance is active</div>
+                        </div>
+                        <button class="action-btn confirm" id="insertCardBtn" aria-label="Insert card to begin">
+                            <i class="fas fa-credit-card"></i> Insert Card to Begin
+                        </button>
+                    </div>
+                    
+                    <!-- PIN Entry Screen -->
+                    <div class="pin-screen hidden" id="pinScreen">
+                        <h3>Enter Your PIN</h3>
+                        <p class="mb-20">Please enter your 4-digit PIN using the keypad or keyboard</p>
+                        
+                        <div class="pin-display" id="pinDisplay">
+                            <div class="pin-dot"></div>
+                            <div class="pin-dot"></div>
+                            <div class="pin-dot"></div>
+                            <div class="pin-dot"></div>
+                        </div>
+                        
+                        <div class="keypad-container">
+                            <button class="keypad-btn" data-key="1">1</button>
+                            <button class="keypad-btn" data-key="2">2</button>
+                            <button class="keypad-btn" data-key="3">3</button>
+                            <button class="keypad-btn" data-key="4">4</button>
+                            <button class="keypad-btn" data-key="5">5</button>
+                            <button class="keypad-btn" data-key="6">6</button>
+                            <button class="keypad-btn" data-key="7">7</button>
+                            <button class="keypad-btn" data-key="8">8</button>
+                            <button class="keypad-btn" data-key="9">9</button>
+                            <button class="keypad-btn clear" id="clearPinBtn">Clear</button>
+                            <button class="keypad-btn" data-key="0">0</button>
+                            <button class="keypad-btn backspace" id="backspaceBtn">
+                                <i class="fas fa-backspace"></i>
+                            </button>
+                            <button class="keypad-btn confirm" id="confirmPinBtn">Confirm</button>
+                        </div>
+                        
+                        <div class="accessibility-controls mt-20">
+                            <button class="accessibility-btn" id="repeatVoiceBtn">
+                                <i class="fas fa-redo"></i> Repeat Instructions
+                            </button>
+                            <button class="accessibility-btn" id="headphoneModeBtn">
+                                <i class="fas fa-headphones"></i> Headphone Mode
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Main Menu Screen -->
+                    <div class="menu-screen hidden" id="menuScreen">
+                        <h3>Select Transaction</h3>
+                        <p class="mb-20">Use arrow keys or tab to navigate, then press Enter to select</p>
+                        
+                        <div class="menu-container">
+                            <button class="menu-btn" id="withdrawBtn" aria-label="Withdraw cash">
+                                <i class="fas fa-money-bill-wave"></i>
+                                <span>Withdraw</span>
+                            </button>
+                            <button class="menu-btn" id="depositBtn" aria-label="Make a deposit">
+                                <i class="fas fa-wallet"></i>
+                                <span>Deposit</span>
+                            </button>
+                            <button class="menu-btn" id="balanceBtn" aria-label="Check balance">
+                                <i class="fas fa-balance-scale"></i>
+                                <span>Balance Inquiry</span>
+                            </button>
+                            <button class="menu-btn" id="changePinBtn" aria-label="Change PIN">
+                                <i class="fas fa-key"></i>
+                                <span>Change PIN</span>
+                            </button>
+                            <button class="menu-btn" id="historyBtn" aria-label="View transaction history">
+                                <i class="fas fa-history"></i>
+                                <span>Transaction History</span>
+                            </button>
+                            <button class="menu-btn" id="exitBtn" aria-label="Exit and return card">
+                                <i class="fas fa-sign-out-alt"></i>
+                                <span>Exit / Return Card</span>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Withdrawal Screen -->
+                    <div class="transaction-screen hidden" id="withdrawScreen">
+                        <h3>Withdraw Cash</h3>
+                        <p class="mb-20">Select an amount or enter custom amount</p>
+                        
+                        <div class="amount-buttons">
+                            <button class="amount-btn" data-amount="500">₦500</button>
+                            <button class="amount-btn" data-amount="1000">₦1,000</button>
+                            <button class="amount-btn" data-amount="2000">₦2,000</button>
+                            <button class="amount-btn" data-amount="5000">₦5,000</button>
+                            <button class="amount-btn" data-amount="10000">₦10,000</button>
+                            <button class="amount-btn" data-amount="20000">₦20,000</button>
+                        </div>
+                        
+                        <div class="amount-input-container">
+                            <input type="number" class="amount-input" id="withdrawAmount" placeholder="Enter custom amount" min="100" max="100000" step="100" aria-label="Enter custom withdrawal amount">
+                            <div class="status status-info" id="withdrawInfo">Minimum: ₦100, Maximum: ₦100,000</div>
+                        </div>
+                        
+                        <div class="transaction-buttons">
+                            <button class="action-btn confirm" id="confirmWithdrawBtn">Confirm Withdrawal</button>
+                            <button class="action-btn cancel" id="cancelWithdrawBtn">Cancel</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Deposit Screen -->
+                    <div class="transaction-screen hidden" id="depositScreen">
+                        <h3>Deposit Funds</h3>
+                        <p class="mb-20">Enter the amount you wish to deposit</p>
+                        
+                        <div class="amount-input-container">
+                            <input type="number" class="amount-input" id="depositAmount" placeholder="Enter deposit amount" min="100" max="500000" step="100" aria-label="Enter deposit amount">
+                            <div class="status status-info" id="depositInfo">Minimum: ₦100, Maximum: ₦500,000</div>
+                        </div>
+                        
+                        <div class="transaction-buttons">
+                            <button class="action-btn confirm" id="confirmDepositBtn">Confirm Deposit</button>
+                            <button class="action-btn cancel" id="cancelDepositBtn">Cancel</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Balance Screen -->
+                    <div class="transaction-screen hidden" id="balanceScreen">
+                        <h3>Account Balance</h3>
+                        
+                        <div class="balance-display">
+                            <p>Your current available balance is:</p>
+                            <div class="balance-amount">
+                                <span class="currency">₦</span>
+                                <span id="balanceAmount">50,000</span>
+                            </div>
+                            <p>Last updated: <span id="balanceUpdateTime">Just now</span></p>
+                        </div>
+                        
+                        <div class="transaction-buttons">
+                            <button class="action-btn confirm" id="backFromBalanceBtn">Back to Menu</button>
+                            <button class="action-btn" id="printReceiptBtn">
+                                <i class="fas fa-print"></i> Print Receipt (Simulated)
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Transaction History Screen -->
+                    <div class="transaction-screen hidden" id="historyScreen">
+                        <h3>Transaction History</h3>
+                        <p class="mb-20">Your last 10 transactions</p>
+                        
+                        <div class="transaction-history" id="transactionHistory">
+                            <!-- Transactions will be inserted here by JavaScript -->
+                        </div>
+                        
+                        <div class="transaction-buttons">
+                            <button class="action-btn confirm" id="backFromHistoryBtn">Back to Menu</button>
+                            <button class="action-btn" id="clearHistoryBtn">
+                                <i class="fas fa-trash"></i> Clear History
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Change PIN Screen -->
+                    <div class="transaction-screen hidden" id="changePinScreen">
+                        <h3>Change PIN</h3>
+                        <p class="mb-20">Enter your current PIN and new PIN</p>
+                        
+                        <div class="pin-input-container">
+                            <div class="mb-20">
+                                <label for="currentPin">Current PIN</label>
+                                <input type="password" class="amount-input" id="currentPin" placeholder="Enter current PIN" maxlength="4" aria-label="Enter current 4-digit PIN">
+                            </div>
+                            
+                            <div class="mb-20">
+                                <label for="newPin">New PIN (4 digits)</label>
+                                <input type="password" class="amount-input" id="newPin" placeholder="Enter new PIN" maxlength="4" aria-label="Enter new 4-digit PIN">
+                            </div>
+                            
+                            <div class="mb-20">
+                                <label for="confirmNewPin">Confirm New PIN</label>
+                                <input type="password" class="amount-input" id="confirmNewPin" placeholder="Confirm new PIN" maxlength="4" aria-label="Confirm new 4-digit PIN">
+                            </div>
+                        </div>
+                        
+                        <div class="transaction-buttons">
+                            <button class="action-btn confirm" id="confirmPinChangeBtn">Change PIN</button>
+                            <button class="action-btn cancel" id="cancelPinChangeBtn">Cancel</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Transaction Result Screen -->
+                    <div class="transaction-screen hidden" id="resultScreen">
+                        <h3 id="resultTitle">Transaction Complete</h3>
+                        
+                        <div class="balance-display" id="resultContent">
+                            <!-- Result content will be inserted here -->
+                        </div>
+                        
+                        <div class="transaction-buttons">
+                            <button class="action-btn confirm" id="resultBackBtn">Back to Menu</button>
+                            <button class="action-btn" id="resultNewTransactionBtn">
+                                <i class="fas fa-redo"></i> New Transaction
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Accessibility Controls -->
+                <div class="accessibility-controls">
+                    <button class="accessibility-btn" id="voiceToggleBtn">
+                        <i class="fas fa-volume-up"></i> Voice: ON
+                    </button>
+                    <button class="accessibility-btn" id="highContrastBtn">
+                        <i class="fas fa-adjust"></i> High Contrast
+                    </button>
+                    <button class="accessibility-btn" id="largeFontBtn">
+                        <i class="fas fa-text-height"></i> Large Font
+                    </button>
+                    <button class="accessibility-btn" id="keyboardHelpBtn">
+                        <i class="fas fa-keyboard"></i> Keyboard Help
+                    </button>
+                </div>
+            </div>
+            
+            <!-- ATM Physical Buttons -->
+            <div class="atm-buttons">
+                <button class="physical-btn" id="cancelBtn" aria-label="Cancel transaction">
+                    <i class="fas fa-times"></i>
+                </button>
+                <button class="physical-btn" id="clearBtn" aria-label="Clear input">
+                    <i class="fas fa-eraser"></i>
+                </button>
+                <button class="physical-btn" id="enterBtn" aria-label="Enter or confirm">
+                    <i class="fas fa-check"></i>
+                </button>
+                <button class="physical-btn" id="helpBtn" aria-label="Help">
+                    <i class="fas fa-question"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ATM Application - Main JavaScript
+        
+        // Global Variables
+        let currentState = 'welcome';
+        let enteredPin = '';
+        let userBalance = 50000; // Default balance in Naira
+        let currentPin = '1234'; // Default PIN
+        let isVoiceEnabled = true;
+        let isHighContrast = false;
+        let isLargeFont = false;
+        let isHeadphoneMode = false;
+        let speechSynthesis = window.speechSynthesis;
+        let currentUtterance = null;
+        
+        // Transaction history array
+        let transactionHistory = [];
+        
+        // Audio elements for sound feedback
+        const keypressSound = new Audio('https://assets.mixkit.co/sfx/preview/mixkit-select-click-1109.mp3');
+        const successSound = new Audio('https://assets.mixkit.co/sfx/preview/mixkit-correct-answer-tone-2870.mp3');
+        const errorSound = new Audio('https://assets.mixkit.co/sfx/preview/mixkit-wrong-answer-fail-notification-946.mp3');
+        const cashSound = new Audio('https://assets.mixkit.co/sfx/preview/mixkit-cash-machine-printing-receipt-2716.mp3');
+        
+        // Set audio volume
+        keypressSound.volume = 0.5;
+        successSound.volume = 0.5;
+        errorSound.volume = 0.5;
+        cashSound.volume = 0.5;
+        
+        // DOM Elements
+        const atmScreen = document.getElementById('atmScreen');
+        const screenContent = document.getElementById('screenContent');
+        const welcomeScreen = document.getElementById('welcomeScreen');
+        const pinScreen = document.getElementById('pinScreen');
+        const menuScreen = document.getElementById('menuScreen');
+        const withdrawScreen = document.getElementById('withdrawScreen');
+        const depositScreen = document.getElementById('depositScreen');
+        const balanceScreen = document.getElementById('balanceScreen');
+        const historyScreen = document.getElementById('historyScreen');
+        const changePinScreen = document.getElementById('changePinScreen');
+        const resultScreen = document.getElementById('resultScreen');
+        
+        // Buttons
+        const insertCardBtn = document.getElementById('insertCardBtn');
+        const keypadBtns = document.querySelectorAll('.keypad-btn[data-key]');
+        const clearPinBtn = document.getElementById('clearPinBtn');
+        const backspaceBtn = document.getElementById('backspaceBtn');
+        const confirmPinBtn = document.getElementById('confirmPinBtn');
+        
+        // Menu buttons
+        const withdrawBtn = document.getElementById('withdrawBtn');
+        const depositBtn = document.getElementById('depositBtn');
+        const balanceBtn = document.getElementById('balanceBtn');
+        const changePinBtn = document.getElementById('changePinBtn');
+        const historyBtn = document.getElementById('historyBtn');
+        const exitBtn = document.getElementById('exitBtn');
+        
+        // Accessibility buttons
+        const voiceToggleBtn = document.getElementById('voiceToggleBtn');
+        const highContrastBtn = document.getElementById('highContrastBtn');
+        const largeFontBtn = document.getElementById('largeFontBtn');
+        const repeatVoiceBtn = document.getElementById('repeatVoiceBtn');
+        const headphoneModeBtn = document.getElementById('headphoneModeBtn');
+        const keyboardHelpBtn = document.getElementById('keyboardHelpBtn');
+        
+        // Physical buttons
+        const cancelBtn = document.getElementById('cancelBtn');
+        const clearBtn = document.getElementById('clearBtn');
+        const enterBtn = document.getElementById('enterBtn');
+        const helpBtn = document.getElementById('helpBtn');
+        
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            initApp();
+            updateTime();
+            setInterval(updateTime, 60000); // Update time every minute
+            
+            // Load data from localStorage if available
+            loadFromLocalStorage();
+            
+            // Initialize speech synthesis
+            initSpeechSynthesis();
+            
+            // Speak welcome message
+            speakMessage("Welcome to AccessiBank ATM. Designed for visually impaired users. Press the Insert Card button to begin, or use Tab to navigate.");
+        });
+        
+        // Initialize the application
+        function initApp() {
+            // Set up event listeners
+            setupEventListeners();
+            
+            // Update balance display
+            updateBalanceDisplay();
+            
+            // Load transaction history
+            loadTransactionHistory();
+        }
+        
+        // Set up all event listeners
+        function setupEventListeners() {
+            // Main navigation buttons
+            insertCardBtn.addEventListener('click', startTransaction);
+            
+            // PIN screen buttons
+            keypadBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const key = this.getAttribute('data-key');
+                    addToPin(key);
+                });
+            });
+            
+            clearPinBtn.addEventListener('click', clearPin);
+            backspaceBtn.addEventListener('click', backspacePin);
+            confirmPinBtn.addEventListener('click', confirmPin);
+            
+            // Menu buttons
+            withdrawBtn.addEventListener('click', () => showScreen('withdraw'));
+            depositBtn.addEventListener('click', () => showScreen('deposit'));
+            balanceBtn.addEventListener('click', () => showScreen('balance'));
+            changePinBtn.addEventListener('click', () => showScreen('changePin'));
+            historyBtn.addEventListener('click', () => showScreen('history'));
+            exitBtn.addEventListener('click', exitATM);
+            
+            // Withdrawal screen
+            document.querySelectorAll('.amount-btn[data-amount]').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const amount = this.getAttribute('data-amount');
+                    document.getElementById('withdrawAmount').value = amount;
+                    playSound(keypressSound);
+                    speakMessage(`You selected ${formatCurrency(amount)}. Press confirm to proceed or enter a different amount.`);
+                });
+            });
+            
+            document.getElementById('confirmWithdrawBtn').addEventListener('click', processWithdrawal);
+            document.getElementById('cancelWithdrawBtn').addEventListener('click', () => showScreen('menu'));
+            
+            // Deposit screen
+            document.getElementById('confirmDepositBtn').addEventListener('click', processDeposit);
+            document.getElementById('cancelDepositBtn').addEventListener('click', () => showScreen('menu'));
+            
+            // Balance screen
+            document.getElementById('backFromBalanceBtn').addEventListener('click', () => showScreen('menu'));
+            document.getElementById('printReceiptBtn').addEventListener('click', printReceipt);
+            
+            // History screen
+            document.getElementById('backFromHistoryBtn').addEventListener('click', () => showScreen('menu'));
+            document.getElementById('clearHistoryBtn').addEventListener('click', clearHistory);
+            
+            // Change PIN screen
+            document.getElementById('confirmPinChangeBtn').addEventListener('click', processPinChange);
+            document.getElementById('cancelPinChangeBtn').addEventListener('click', () => showScreen('menu'));
+            
+            // Result screen
+            document.getElementById('resultBackBtn').addEventListener('click', () => showScreen('menu'));
+            document.getElementById('resultNewTransactionBtn').addEventListener('click', startNewTransaction);
+            
+            // Accessibility controls
+            voiceToggleBtn.addEventListener('click', toggleVoice);
+            highContrastBtn.addEventListener('click', toggleHighContrast);
+            largeFontBtn.addEventListener('click', toggleLargeFont);
+            repeatVoiceBtn.addEventListener('click', repeatLastInstruction);
+            headphoneModeBtn.addEventListener('click', toggleHeadphoneMode);
+            keyboardHelpBtn.addEventListener('click', showKeyboardHelp);
+            
+            // Physical buttons
+            cancelBtn.addEventListener('click', handleCancel);
+            clearBtn.addEventListener('click', handleClear);
+            enterBtn.addEventListener('click', handleEnter);
+            helpBtn.addEventListener('click', showHelp);
+            
+            // Keyboard navigation
+            document.addEventListener('keydown', handleKeyboardNavigation);
+            
+            // PIN input via keyboard
+            document.addEventListener('keydown', function(e) {
+                if (currentState === 'pin' && /^[0-9]$/.test(e.key)) {
+                    addToPin(e.key);
+                } else if (currentState === 'pin' && e.key === 'Backspace') {
+                    backspacePin();
+                } else if (currentState === 'pin' && e.key === 'Enter') {
+                    confirmPin();
+                }
+            });
+        }
+        
+        // Show a specific screen
+        function showScreen(screenName) {
+            // Hide all screens
+            const screens = [
+                welcomeScreen, pinScreen, menuScreen, withdrawScreen, 
+                depositScreen, balanceScreen, historyScreen, changePinScreen, resultScreen
+            ];
+            
+            screens.forEach(screen => {
+                screen.classList.add('hidden');
+            });
+            
+            // Update current state
+            currentState = screenName;
+            
+            // Show the requested screen
+            let screenToShow;
+            let message = '';
+            
+            switch(screenName) {
+                case 'welcome':
+                    screenToShow = welcomeScreen;
+                    message = "Welcome to AccessiBank. Please insert your card to begin.";
+                    break;
+                case 'pin':
+                    screenToShow = pinScreen;
+                    resetPin();
+                    message = "Please enter your 4-digit PIN using the keypad or your keyboard.";
+                    break;
+                case 'menu':
+                    screenToShow = menuScreen;
+                    message = "Main menu. Use arrow keys or Tab to navigate. Options: Withdraw, Deposit, Balance Inquiry, Change PIN, Transaction History, or Exit.";
+                    break;
+                case 'withdraw':
+                    screenToShow = withdrawScreen;
+                    document.getElementById('withdrawAmount').value = '';
+                    message = "Withdrawal screen. Select a quick amount or enter a custom amount. Minimum withdrawal is 100 Naira, maximum is 100,000 Naira.";
+                    break;
+                case 'deposit':
+                    screenToShow = depositScreen;
+                    document.getElementById('depositAmount').value = '';
+                    message = "Deposit screen. Enter the amount you wish to deposit. Minimum deposit is 100 Naira, maximum is 500,000 Naira.";
+                    break;
+                case 'balance':
+                    screenToShow = balanceScreen;
+                    updateBalanceDisplay();
+                    message = `Balance inquiry. Your current balance is ${formatCurrency(userBalance)}.`;
+                    break;
+                case 'history':
+                    screenToShow = historyScreen;
+                    displayTransactionHistory();
+                    message = "Transaction history. Showing your last 10 transactions.";
+                    break;
+                case 'changePin':
+                    screenToShow = changePinScreen;
+                    document.getElementById('currentPin').value = '';
+                    document.getElementById('newPin').value = '';
+                    document.getElementById('confirmNewPin').value = '';
+                    message = "Change PIN screen. Enter your current PIN, then your new 4-digit PIN twice for confirmation.";
+                    break;
+                case 'result':
+                    screenToShow = resultScreen;
+                    // Message will be set by the function calling showScreen('result')
+                    break;
+            }
+            
+            if (screenToShow) {
+                screenToShow.classList.remove('hidden');
+                playSound(keypressSound);
+                
+                if (isVoiceEnabled && message) {
+                    speakMessage(message);
+                }
+            }
+        }
+        
+        // Speech Synthesis Functions
+        function initSpeechSynthesis() {
+            // Check if speech synthesis is supported
+            if (!speechSynthesis) {
+                console.warn("Speech synthesis not supported");
+                isVoiceEnabled = false;
+                voiceToggleBtn.innerHTML = '<i class="fas fa-volume-mute"></i> Voice: Not Supported';
+                voiceToggleBtn.disabled = true;
+                return;
+            }
+            
+            // Set voice properties
+            speechSynthesis.onvoiceschanged = function() {
+                // Get available voices
+                const voices = speechSynthesis.getVoices();
+                
+                // Prefer a female English voice for better clarity
+                const preferredVoice = voices.find(voice => 
+                    voice.lang.startsWith('en') && voice.name.includes('Female')
+                ) || voices.find(voice => voice.lang.startsWith('en'));
+                
+                if (preferredVoice) {
+                    // Voice will be set when speaking
+                }
+            };
+        }
+        
+        function speakMessage(text) {
+            if (!isVoiceEnabled || !speechSynthesis) return;
+            
+            // Cancel any ongoing speech
+            speechSynthesis.cancel();
+            
+            // Create and configure utterance
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.rate = isHeadphoneMode ? 0.9 : 1.0;
+            utterance.pitch = 1.0;
+            utterance.volume = isHeadphoneMode ? 0.8 : 1.0;
+            
+            // Set voice
+            const voices = speechSynthesis.getVoices();
+            const englishVoice = voices.find(voice => voice.lang.startsWith('en'));
+            if (englishVoice) {
+                utterance.voice = englishVoice;
+            }
+            
+            // Store current utterance for repeat functionality
+            currentUtterance = utterance;
+            
+            // Speak
+            speechSynthesis.speak(utterance);
+            
+            // Show speech indicator
+            document.getElementById('speechIndicator').classList.remove('hidden');
+            
+            // Hide indicator when done
+            utterance.onend = function() {
+                document.getElementById('speechIndicator').classList.add('hidden');
+            };
+        }
+        
+        function toggleVoice() {
+            isVoiceEnabled = !isVoiceEnabled;
+            
+            if (isVoiceEnabled) {
+                voiceToggleBtn.innerHTML = '<i class="fas fa-volume-up"></i> Voice: ON';
+                speakMessage("Voice guidance enabled.");
+            } else {
+                voiceToggleBtn.innerHTML = '<i class="fas fa-volume-mute"></i> Voice: OFF';
+                speechSynthesis.cancel();
+            }
+            
+            saveToLocalStorage();
+        }
+        
+        function repeatLastInstruction() {
+            if (currentUtterance && isVoiceEnabled) {
+                speechSynthesis.cancel();
+                speechSynthesis.speak(currentUtterance);
+            }
+        }
+        
+        function toggleHeadphoneMode() {
+            isHeadphoneMode = !isHeadphoneMode;
+            
+            if (isHeadphoneMode) {
+                headphoneModeBtn.classList.add('active');
+                headphoneModeBtn.innerHTML = '<i class="fas fa-headphones"></i> Headphone: ON';
+                speakMessage("Headphone mode enabled. Voice volume and speed adjusted for headphone use.");
+            } else {
+                headphoneModeBtn.classList.remove('active');
+                headphoneModeBtn.innerHTML = '<i class="fas fa-headphones"></i> Headphone Mode';
+                speakMessage("Headphone mode disabled.");
+            }
+            
+            saveToLocalStorage();
+        }
+        
+        // PIN Handling Functions
+        function addToPin(digit) {
+            if (enteredPin.length < 4) {
+                enteredPin += digit;
+                updatePinDisplay();
+                playSound(keypressSound);
+                
+                if (enteredPin.length === 4) {
+                    speakMessage("PIN entered. Press confirm to continue or backspace to correct.");
+                } else {
+                    speakMessage(digit);
+                }
+            }
+        }
+        
+        function backspacePin() {
+            if (enteredPin.length > 0) {
+                enteredPin = enteredPin.slice(0, -1);
+                updatePinDisplay();
+                playSound(keypressSound);
+                speakMessage("Digit removed.");
+            }
+        }
+        
+        function clearPin() {
+            enteredPin = '';
+            updatePinDisplay();
+            playSound(keypressSound);
+            speakMessage("PIN cleared.");
+        }
+        
+        function resetPin() {
+            enteredPin = '';
+            updatePinDisplay();
+        }
+        
+        function updatePinDisplay() {
+            const pinDots = document.querySelectorAll('.pin-dot');
+            
+            pinDots.forEach((dot, index) => {
+                if (index < enteredPin.length) {
+                    dot.classList.add('filled');
+                } else {
+                    dot.classList.remove('filled');
+                }
+            });
+        }
+        
+        function confirmPin() {
+            if (enteredPin.length !== 4) {
+                speakMessage("Please enter a 4-digit PIN.");
+                return;
+            }
+            
+            playSound(keypressSound);
+            
+            if (enteredPin === currentPin) {
+                speakMessage("PIN accepted. Loading main menu.");
+                playSound(successSound);
+                
+                // Add a small delay for better UX
+                setTimeout(() => {
+                    showScreen('menu');
+                }, 1000);
+            } else {
+                speakMessage("Incorrect PIN. Please try again.");
+                playSound(errorSound);
+                resetPin();
+            }
+        }
+        
+        // Transaction Functions
+        function startTransaction() {
+            playSound(keypressSound);
+            speakMessage("Card inserted. Please enter your 4-digit PIN.");
+            showScreen('pin');
+        }
+        
+        function processWithdrawal() {
+            const amountInput = document.getElementById('withdrawAmount');
+            const amount = parseInt(amountInput.value);
+            
+            if (!amount || amount < 100) {
+                speakMessage("Please enter a valid amount. Minimum withdrawal is 100 Naira.");
+                playSound(errorSound);
+                return;
+            }
+            
+            if (amount > 100000) {
+                speakMessage("Maximum withdrawal amount is 100,000 Naira. Please enter a smaller amount.");
+                playSound(errorSound);
+                return;
+            }
+            
+            if (amount > userBalance) {
+                speakMessage("Insufficient funds. Your balance is " + formatCurrency(userBalance) + ". Please enter a smaller amount.");
+                playSound(errorSound);
+                return;
+            }
+            
+            // Process withdrawal
+            userBalance -= amount;
+            playSound(cashSound);
+            
+            // Add to transaction history
+            addTransaction('Withdrawal', -amount);
+            
+            // Show success screen
+            showResultScreen(
+                "Withdrawal Successful",
+                `You have withdrawn ${formatCurrency(amount)}.<br>
+                 Your new balance is ${formatCurrency(userBalance)}.<br>
+                 <div class="status status-success mt-20">Transaction completed successfully.</div>`,
+                `Withdrawal successful. You have withdrawn ${formatCurrency(amount)}. Your new balance is ${formatCurrency(userBalance)}.`
+            );
+            
+            // Update localStorage
+            saveToLocalStorage();
+        }
+        
+        function processDeposit() {
+            const amountInput = document.getElementById('depositAmount');
+            const amount = parseInt(amountInput.value);
+            
+            if (!amount || amount < 100) {
+                speakMessage("Please enter a valid amount. Minimum deposit is 100 Naira.");
+                playSound(errorSound);
+                return;
+            }
+            
+            if (amount > 500000) {
+                speakMessage("Maximum deposit amount is 500,000 Naira. Please enter a smaller amount.");
+                playSound(errorSound);
+                return;
+            }
+            
+            // Process deposit
+            userBalance += amount;
+            playSound(successSound);
+            
+            // Add to transaction history
+            addTransaction('Deposit', amount);
+            
+            // Show success screen
+            showResultScreen(
+                "Deposit Successful",
+                `You have deposited ${formatCurrency(amount)}.<br>
+                 Your new balance is ${formatCurrency(userBalance)}.<br>
+                 <div class="status status-success mt-20">Transaction completed successfully.</div>`,
+                `Deposit successful. You have deposited ${formatCurrency(amount)}. Your new balance is ${formatCurrency(userBalance)}.`
+            );
+            
+            // Update localStorage
+            saveToLocalStorage();
+        }
+        
+        function processPinChange() {
+            const currentPinInput = document.getElementById('currentPin').value;
+            const newPinInput = document.getElementById('newPin').value;
+            const confirmNewPinInput = document.getElementById('confirmNewPin').value;
+            
+            if (currentPinInput !== currentPin) {
+                speakMessage("Current PIN is incorrect. Please try again.");
+                playSound(errorSound);
+                return;
+            }
+            
+            if (newPinInput.length !== 4 || !/^\d{4}$/.test(newPinInput)) {
+                speakMessage("New PIN must be exactly 4 digits. Please try again.");
+                playSound(errorSound);
+                return;
+            }
+            
+            if (newPinInput !== confirmNewPinInput) {
+                speakMessage("New PINs do not match. Please try again.");
+                playSound(errorSound);
+                return;
+            }
+            
+            // Change PIN
+            currentPin = newPinInput;
+            playSound(successSound);
+            
+            // Show success screen
+            showResultScreen(
+                "PIN Changed Successfully",
+                `Your PIN has been updated successfully.<br>
+                 <div class="status status-success mt-20">Remember your new PIN for future transactions.</div>`,
+                "PIN changed successfully. Remember your new PIN for future transactions."
+            );
+            
+            // Update localStorage
+            saveToLocalStorage();
+        }
+        
+        function showResultScreen(title, htmlContent, speechMessage) {
+            document.getElementById('resultTitle').textContent = title;
+            document.getElementById('resultContent').innerHTML = htmlContent;
+            
+            if (isVoiceEnabled) {
+                speakMessage(speechMessage);
+            }
+            
+            showScreen('result');
+        }
+        
+        function startNewTransaction() {
+            playSound(keypressSound);
+            showScreen('menu');
+        }
+        
+        function exitATM() {
+            playSound(keypressSound);
+            speakMessage("Thank you for using AccessiBank. Please remember to take your card. Goodbye.");
+            
+            // Add a small delay before returning to welcome screen
+            setTimeout(() => {
+                resetPin();
+                showScreen('welcome');
+            }, 2000);
+        }
+        
+        // Transaction History Functions
+        function addTransaction(type, amount) {
+            const transaction = {
+                type: type,
+                amount: amount,
+                date: new Date().toLocaleString(),
+                balance: userBalance
+            };
+            
+            transactionHistory.unshift(transaction); // Add to beginning
+            
+            // Keep only last 10 transactions
+            if (transactionHistory.length > 10) {
+                transactionHistory = transactionHistory.slice(0, 10);
+            }
+            
+            // Save to localStorage
+            saveToLocalStorage();
+        }
+        
+        function displayTransactionHistory() {
+            const historyContainer = document.getElementById('transactionHistory');
+            
+            if (transactionHistory.length === 0) {
+                historyContainer.innerHTML = `
+                    <div class="transaction-item">
+                        <div>No transactions yet</div>
+                    </div>
+                `;
+                return;
+            }
+            
+            let html = '';
+            
+            transactionHistory.forEach(transaction => {
+                const amountClass = transaction.amount > 0 ? 'status-success' : 'status-error';
+                const amountSign = transaction.amount > 0 ? '+' : '';
+                
+                html += `
+                    <div class="transaction-item">
+                        <div>
+                            <div class="transaction-type">${transaction.type}</div>
+                            <div class="transaction-date">${transaction.date}</div>
+                        </div>
+                        <div class="transaction-amount ${amountClass}">
+                            ${amountSign}${formatCurrency(transaction.amount)}
+                        </div>
+                    </div>
+                `;
+            });
+            
+            historyContainer.innerHTML = html;
+        }
+        
+        function clearHistory() {
+            if (confirm("Are you sure you want to clear your transaction history?")) {
+                transactionHistory = [];
+                saveToLocalStorage();
+                displayTransactionHistory();
+                speakMessage("Transaction history cleared.");
+                playSound(keypressSound);
+            }
+        }
+        
+        function loadTransactionHistory() {
+            // Load from localStorage or create sample data
+            if (transactionHistory.length === 0) {
+                // Add sample transactions
+                addTransaction('Deposit', 50000);
+                addTransaction('Withdrawal', -5000);
+                addTransaction('Withdrawal', -10000);
+                addTransaction('Deposit', 20000);
+            }
+        }
+        
+        // Accessibility Functions
+        function toggleHighContrast() {
+            isHighContrast = !isHighContrast;
+            
+            if (isHighContrast) {
+                document.body.classList.add('high-contrast');
+                atmScreen.classList.add('high-contrast');
+                highContrastBtn.classList.add('active');
+                highContrastBtn.innerHTML = '<i class="fas fa-adjust"></i> High Contrast: ON';
+                speakMessage("High contrast mode enabled.");
+            } else {
+                document.body.classList.remove('high-contrast');
+                atmScreen.classList.remove('high-contrast');
+                highContrastBtn.classList.remove('active');
+                highContrastBtn.innerHTML = '<i class="fas fa-adjust"></i> High Contrast';
+                speakMessage("High contrast mode disabled.");
+            }
+            
+            saveToLocalStorage();
+        }
+        
+        function toggleLargeFont() {
+            isLargeFont = !isLargeFont;
+            
+            if (isLargeFont) {
+                document.body.classList.add('large-font');
+                largeFontBtn.classList.add('active');
+                largeFontBtn.innerHTML = '<i class="fas fa-text-height"></i> Large Font: ON';
+                speakMessage("Large font mode enabled.");
+            } else {
+                document.body.classList.remove('large-font');
+                largeFontBtn.classList.remove('active');
+                largeFontBtn.innerHTML = '<i class="fas fa-text-height"></i> Large Font';
+                speakMessage("Large font mode disabled.");
+            }
+            
+            saveToLocalStorage();
+        }
+        
+        function showKeyboardHelp() {
+            const helpMessage = `
+                Keyboard Navigation Guide:
+                - Tab: Move forward between elements
+                - Shift+Tab: Move backward between elements
+                - Enter: Activate selected button or option
+                - Arrow keys: Navigate between options in menus
+                - Escape: Cancel or go back
+                - Number keys: Enter PIN or amounts
+                - Space: Activate buttons
+            `;
+            
+            alert(helpMessage);
+            speakMessage("Keyboard help displayed in a dialog box.");
+        }
+        
+        function showHelp() {
+            const helpMessage = `
+                AccessiBank ATM Help:
+                
+                This ATM is designed for visually impaired users.
+                
+                Features:
+                1. Voice guidance for all actions
+                2. Keyboard navigation support
+                3. High contrast mode
+                4. Large font mode
+                5. Headphone mode for privacy
+                6. Repeat instructions button
+                
+                Test Account:
+                PIN: 1234
+                Balance: ₦50,000
+                
+                All data is stored locally in your browser.
+            `;
+            
+            alert(helpMessage);
+            speakMessage("ATM help information displayed in a dialog box.");
+        }
+        
+        // Physical Button Handlers
+        function handleCancel() {
+            playSound(keypressSound);
+            
+            switch(currentState) {
+                case 'pin':
+                    speakMessage("Cancelled. Returning to welcome screen.");
+                    showScreen('welcome');
+                    break;
+                case 'withdraw':
+                case 'deposit':
+                case 'changePin':
+                    speakMessage("Cancelled. Returning to main menu.");
+                    showScreen('menu');
+                    break;
+                case 'balance':
+                case 'history':
+                case 'result':
+                    showScreen('menu');
+                    break;
+                default:
+                    showScreen('welcome');
+            }
+        }
+        
+        function handleClear() {
+            playSound(keypressSound);
+            
+            switch(currentState) {
+                case 'pin':
+                    clearPin();
+                    break;
+                case 'withdraw':
+                    document.getElementById('withdrawAmount').value = '';
+                    speakMessage("Amount cleared.");
+                    break;
+                case 'deposit':
+                    document.getElementById('depositAmount').value = '';
+                    speakMessage("Amount cleared.");
+                    break;
+                case 'changePin':
+                    document.getElementById('currentPin').value = '';
+                    document.getElementById('newPin').value = '';
+                    document.getElementById('confirmNewPin').value = '';
+                    speakMessage("All PIN fields cleared.");
+                    break;
+            }
+        }
+        
+        function handleEnter() {
+            playSound(keypressSound);
+            
+            switch(currentState) {
+                case 'pin':
+                    confirmPin();
+                    break;
+                case 'withdraw':
+                    processWithdrawal();
+                    break;
+                case 'deposit':
+                    processDeposit();
+                    break;
+                case 'changePin':
+                    processPinChange();
+                    break;
+                case 'menu':
+                    // Simulate selecting the first menu option
+                    speakMessage("Withdraw selected. Press Enter again to confirm or use arrow keys to navigate.");
+                    break;
+            }
+        }
+        
+        // Keyboard Navigation
+        function handleKeyboardNavigation(e) {
+            // Don't interfere with input fields
+            if (e.target.tagName === 'INPUT') return;
+            
+            switch(e.key) {
+                case 'Escape':
+                    handleCancel();
+                    break;
+                case 'Enter':
+                    // Let the default button handling work
+                    break;
+                case ' ':
+                    // Space bar to activate focused element
+                    if (document.activeElement && document.activeElement.tagName === 'BUTTON') {
+                        document.activeElement.click();
+                        e.preventDefault();
+                    }
+                    break;
+                case 'ArrowUp':
+                case 'ArrowDown':
+                    // Navigate through menu items
+                    if (currentState === 'menu') {
+                        navigateMenu(e.key);
+                        e.preventDefault();
+                    }
+                    break;
+                case '1':
+                case '2':
+                case '3':
+                case '4':
+                case '5':
+                case '6':
+                    // Quick menu selection by number
+                    if (currentState === 'menu') {
+                        selectMenuByNumber(e.key);
+                        e.preventDefault();
+                    }
+                    break;
+            }
+        }
+        
+        function navigateMenu(direction) {
+            const menuButtons = document.querySelectorAll('.menu-btn');
+            const currentIndex = Array.from(menuButtons).indexOf(document.activeElement);
+            let nextIndex;
+            
+            if (direction === 'ArrowDown') {
+                nextIndex = currentIndex < menuButtons.length - 1 ? currentIndex + 1 : 0;
+            } else if (direction === 'ArrowUp') {
+                nextIndex = currentIndex > 0 ? currentIndex - 1 : menuButtons.length - 1;
+            }
+            
+            if (nextIndex !== undefined) {
+                menuButtons[nextIndex].focus();
+                speakMessage(menuButtons[nextIndex].querySelector('span').textContent);
+            }
+        }
+        
+        function selectMenuByNumber(number) {
+            const menuButtons = document.querySelectorAll('.menu-btn');
+            const index = parseInt(number) - 1;
+            
+            if (index >= 0 && index < menuButtons.length) {
+                menuButtons[index].click();
+            }
+        }
+        
+        // Utility Functions
+        function updateBalanceDisplay() {
+            document.getElementById('balanceAmount').textContent = formatCurrency(userBalance);
+            document.getElementById('balanceUpdateTime').textContent = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+        }
+        
+        function formatCurrency(amount) {
+            return amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        }
+        
+        function updateTime() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            document.getElementById('currentTime').textContent = timeString;
+        }
+        
+        function playSound(sound) {
+            // Create a clone of the sound to allow overlapping playback
+            const soundClone = sound.cloneNode();
+            soundClone.volume = isHeadphoneMode ? 0.3 : 0.5;
+            soundClone.play();
+        }
+        
+        function printReceipt() {
+            playSound(cashSound);
+            speakMessage("Printing receipt simulated. Receipt would contain your balance information.");
+            
+            // Create a simple receipt simulation
+            const receiptContent = `
+                AccessiBank Receipt
+                Date: ${new Date().toLocaleString()}
+                Account: ****1234
+                Available Balance: ${formatCurrency(userBalance)}
+                Thank you for banking with us!
+            `;
+            
+            alert("Receipt (Simulated):\n\n" + receiptContent);
+        }
+        
+        // LocalStorage Functions
+        function saveToLocalStorage() {
+            const data = {
+                userBalance: userBalance,
+                currentPin: currentPin,
+                transactionHistory: transactionHistory,
+                isVoiceEnabled: isVoiceEnabled,
+                isHighContrast: isHighContrast,
+                isLargeFont: isLargeFont,
+                isHeadphoneMode: isHeadphoneMode
+            };
+            
+            localStorage.setItem('atmData', JSON.stringify(data));
+        }
+        
+        function loadFromLocalStorage() {
+            const savedData = localStorage.getItem('atmData');
+            
+            if (savedData) {
+                try {
+                    const data = JSON.parse(savedData);
+                    
+                    userBalance = data.userBalance || userBalance;
+                    currentPin = data.currentPin || currentPin;
+                    transactionHistory = data.transactionHistory || transactionHistory;
+                    isVoiceEnabled = data.isVoiceEnabled !== undefined ? data.isVoiceEnabled : isVoiceEnabled;
+                    isHighContrast = data.isHighContrast || false;
+                    isLargeFont = data.isLargeFont || false;
+                    isHeadphoneMode = data.isHeadphoneMode || false;
+                    
+                    // Update UI based on loaded settings
+                    if (isHighContrast) {
+                        document.body.classList.add('high-contrast');
+                        atmScreen.classList.add('high-contrast');
+                        highContrastBtn.classList.add('active');
+                        highContrastBtn.innerHTML = '<i class="fas fa-adjust"></i> High Contrast: ON';
+                    }
+                    
+                    if (isLargeFont) {
+                        document.body.classList.add('large-font');
+                        largeFontBtn.classList.add('active');
+                        largeFontBtn.innerHTML = '<i class="fas fa-text-height"></i> Large Font: ON';
+                    }
+                    
+                    if (isHeadphoneMode) {
+                        headphoneModeBtn.classList.add('active');
+                        headphoneModeBtn.innerHTML = '<i class="fas fa-headphones"></i> Headphone: ON';
+                    }
+                    
+                    if (!isVoiceEnabled) {
+                        voiceToggleBtn.innerHTML = '<i class="fas fa-volume-mute"></i> Voice: OFF';
+                    }
+                    
+                } catch (e) {
+                    console.error("Error loading saved data:", e);
+                }
+            }
+        }
+    </script>
+</body>
+</html>
