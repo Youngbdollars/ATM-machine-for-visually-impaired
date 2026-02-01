@@ -1,1 +1,602 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voice-Controlled ATM for Visually Impaired</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+</head>
+<body>
+    <!-- Voice Status Indicator -->
+    <div class="voice-status" id="voiceStatus">
+        <div class="pulse-ring"></div>
+        <div class="mic-icon">
+            <i class="fas fa-microphone"></i>
+        </div>
+        <span class="status-text">Listening...</span>
+    </div>
 
+    <!-- Voice Command Help -->
+    <div class="voice-help" id="voiceHelp">
+        <h3><i class="fas fa-robot"></i> Available Voice Commands</h3>
+        <div class="commands-grid">
+            <div class="command-card">
+                <span class="command">"Start" or "Begin"</span>
+                <span class="description">Start ATM session</span>
+            </div>
+            <div class="command-card">
+                <span class="command">"One", "Two", "Three" etc.</span>
+                <span class="description">Enter PIN digits</span>
+            </div>
+            <div class="command-card">
+                <span class="command">"Withdraw"</span>
+                <span class="description">Make a withdrawal</span>
+            </div>
+            <div class="command-card">
+                <span class="command">"Deposit"</span>
+                <span class="description">Make a deposit</span>
+            </div>
+            <div class="command-card">
+                <span class="command">"Balance"</span>
+                <span class="description">Check balance</span>
+            </div>
+            <div class="command-card">
+                <span class="command">"Yes" or "Confirm"</span>
+                <span class="description">Confirm action</span>
+            </div>
+            <div class="command-card">
+                <span class="command">"No" or "Cancel"</span>
+                <span class="description">Cancel action</span>
+            </div>
+            <div class="command-card">
+                <span class="command">"Help"</span>
+                <span class="description">Show commands</span>
+            </div>
+            <div class="command-card">
+                <span class="command">"Repeat"</span>
+                <span class="description">Repeat instructions</span>
+            </div>
+            <div class="command-card">
+                <span class="command">"Exit"</span>
+                <span class="description">End session</span>
+            </div>
+        </div>
+        <button class="close-help" id="closeHelp">
+            <i class="fas fa-times"></i> Close
+        </button>
+    </div>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- ATM Machine -->
+        <div class="atm-machine" id="atmMachine">
+            <!-- ATM Screen -->
+            <div class="atm-screen" id="atmScreen">
+                <!-- Decorative Elements -->
+                <div class="screen-overlay"></div>
+                <div class="particles" id="particles"></div>
+                
+                <!-- Header -->
+                <div class="screen-header">
+                    <div class="bank-logo">
+                        <i class="fas fa-university"></i>
+                        <h1>VoiceBank <span class="highlight">ATM</span></h1>
+                    </div>
+                    <div class="status-indicators">
+                        <div class="indicator online">
+                            <div class="dot"></div>
+                            <span>Online</span>
+                        </div>
+                        <div class="indicator voice-active">
+                            <div class="dot"></div>
+                            <span>Voice Active</span>
+                        </div>
+                        <div class="current-time" id="currentTime">14:30</div>
+                    </div>
+                </div>
+
+                <!-- Main Content Area -->
+                <div class="screen-content" id="screenContent">
+                    <!-- Welcome Screen -->
+                    <div class="screen welcome-screen active" id="welcomeScreen">
+                        <div class="welcome-animation">
+                            <div class="card-insert-animation">
+                                <div class="card-slot">
+                                    <div class="card"></div>
+                                </div>
+                                <div class="insert-arrow">
+                                    <i class="fas fa-arrow-right"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="welcome-message">
+                            <h2 class="animate__animated animate__fadeIn">Welcome to <span class="gradient-text">VoiceBank ATM</span></h2>
+                            <p class="subtitle">Fully voice-controlled banking for everyone</p>
+                            <div class="voice-instruction">
+                                <i class="fas fa-microphone"></i>
+                                <p>Say <span class="command-example">"START"</span> or <span class="command-example">"BEGIN"</span> to insert your card</p>
+                            </div>
+                            <div class="accessibility-features">
+                                <div class="feature">
+                                    <i class="fas fa-robot"></i>
+                                    <span>Voice Controlled</span>
+                                </div>
+                                <div class="feature">
+                                    <i class="fas fa-volume-up"></i>
+                                    <span>Audio Guidance</span>
+                                </div>
+                                <div class="feature">
+                                    <i class="fas fa-keyboard"></i>
+                                    <span>Keyboard Support</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- PIN Entry Screen -->
+                    <div class="screen pin-screen" id="pinScreen">
+                        <div class="pin-header">
+                            <h3><i class="fas fa-key"></i> Voice PIN Entry</h3>
+                            <p class="instruction">Say each digit of your 4-digit PIN</p>
+                        </div>
+                        
+                        <div class="pin-visualization">
+                            <div class="pin-dots">
+                                <div class="pin-dot" id="pinDot1"></div>
+                                <div class="pin-dot" id="pinDot2"></div>
+                                <div class="pin-dot" id="pinDot3"></div>
+                                <div class="pin-dot" id="pinDot4"></div>
+                            </div>
+                            <div class="pin-digits" id="pinDigits">
+                                <span>●</span>
+                                <span>●</span>
+                                <span>●</span>
+                                <span>●</span>
+                            </div>
+                        </div>
+
+                        <div class="voice-feedback">
+                            <div class="recognition-result" id="recognitionResult">
+                                <i class="fas fa-comment-dots"></i>
+                                <span class="result-text">Listening for PIN digits...</span>
+                            </div>
+                            <div class="suggested-commands">
+                                <p>Try saying: <span class="command">"One"</span>, <span class="command">"Two"</span>, <span class="command">"Three"</span>, <span class="command">"Four"</span></p>
+                            </div>
+                        </div>
+
+                        <div class="pin-actions">
+                            <button class="voice-btn" id="clearPinBtn" data-command="clear">
+                                <i class="fas fa-eraser"></i>
+                                <span>Say "CLEAR" to reset</span>
+                            </button>
+                            <button class="voice-btn confirm" id="confirmPinBtn" data-command="confirm">
+                                <i class="fas fa-check-circle"></i>
+                                <span>Say "CONFIRM" when done</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Main Menu Screen -->
+                    <div class="screen menu-screen" id="menuScreen">
+                        <h3><i class="fas fa-list-alt"></i> Voice Menu</h3>
+                        <p class="instruction">Say the option you want to select</p>
+                        
+                        <div class="voice-menu-grid">
+                            <div class="menu-option" data-command="withdraw">
+                                <div class="option-icon">
+                                    <i class="fas fa-money-bill-wave"></i>
+                                </div>
+                                <h4>Withdraw Cash</h4>
+                                <p>Say <span class="command">"WITHDRAW"</span></p>
+                                <div class="option-glow"></div>
+                            </div>
+                            
+                            <div class="menu-option" data-command="deposit">
+                                <div class="option-icon">
+                                    <i class="fas fa-wallet"></i>
+                                </div>
+                                <h4>Make Deposit</h4>
+                                <p>Say <span class="command">"DEPOSIT"</span></p>
+                                <div class="option-glow"></div>
+                            </div>
+                            
+                            <div class="menu-option" data-command="balance">
+                                <div class="option-icon">
+                                    <i class="fas fa-balance-scale"></i>
+                                </div>
+                                <h4>Check Balance</h4>
+                                <p>Say <span class="command">"BALANCE"</span></p>
+                                <div class="option-glow"></div>
+                            </div>
+                            
+                            <div class="menu-option" data-command="change pin">
+                                <div class="option-icon">
+                                    <i class="fas fa-key"></i>
+                                </div>
+                                <h4>Change PIN</h4>
+                                <p>Say <span class="command">"CHANGE PIN"</span></p>
+                                <div class="option-glow"></div>
+                            </div>
+                            
+                            <div class="menu-option" data-command="history">
+                                <div class="option-icon">
+                                    <i class="fas fa-history"></i>
+                                </div>
+                                <h4>Transaction History</h4>
+                                <p>Say <span class="command">"HISTORY"</span></p>
+                                <div class="option-glow"></div>
+                            </div>
+                            
+                            <div class="menu-option" data-command="exit">
+                                <div class="option-icon">
+                                    <i class="fas fa-sign-out-alt"></i>
+                                </div>
+                                <h4>Exit / Eject Card</h4>
+                                <p>Say <span class="command">"EXIT"</span></p>
+                                <div class="option-glow"></div>
+                            </div>
+                        </div>
+
+                        <div class="current-balance">
+                            <i class="fas fa-coins"></i>
+                            <span>Available Balance: <strong id="menuBalance">₦50,000</strong></span>
+                        </div>
+                    </div>
+
+                    <!-- Withdrawal Screen -->
+                    <div class="screen transaction-screen" id="withdrawScreen">
+                        <h3><i class="fas fa-money-bill-wave"></i> Voice Withdrawal</h3>
+                        <p class="instruction">Say the amount or choose from quick options</p>
+                        
+                        <div class="amount-display">
+                            <div class="amount-input">
+                                <span class="currency">₦</span>
+                                <input type="text" id="withdrawAmount" value="0" readonly>
+                            </div>
+                            <div class="amount-voice-feedback" id="amountFeedback">
+                                <i class="fas fa-wave-square"></i>
+                                <span>Say amount like "Five Thousand"</span>
+                            </div>
+                        </div>
+
+                        <div class="quick-amounts">
+                            <div class="amount-option" data-amount="1000">
+                                <span>₦1,000</span>
+                                <p>Say <span class="command">"ONE THOUSAND"</span></p>
+                            </div>
+                            <div class="amount-option" data-amount="5000">
+                                <span>₦5,000</span>
+                                <p>Say <span class="command">"FIVE THOUSAND"</span></p>
+                            </div>
+                            <div class="amount-option" data-amount="10000">
+                                <span>₦10,000</span>
+                                <p>Say <span class="command">"TEN THOUSAND"</span></p>
+                            </div>
+                            <div class="amount-option" data-amount="20000">
+                                <span>₦20,000</span>
+                                <p>Say <span class="command">"TWENTY THOUSAND"</span></p>
+                            </div>
+                        </div>
+
+                        <div class="transaction-actions">
+                            <div class="voice-action" data-command="confirm">
+                                <div class="action-icon">
+                                    <i class="fas fa-check-circle"></i>
+                                </div>
+                                <p>Say <span class="command">"CONFIRM"</span> to withdraw</p>
+                            </div>
+                            <div class="voice-action" data-command="cancel">
+                                <div class="action-icon">
+                                    <i class="fas fa-times-circle"></i>
+                                </div>
+                                <p>Say <span class="command">"CANCEL"</span> to go back</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Deposit Screen -->
+                    <div class="screen transaction-screen" id="depositScreen">
+                        <h3><i class="fas fa-wallet"></i> Voice Deposit</h3>
+                        <p class="instruction">Say the amount you want to deposit</p>
+                        
+                        <div class="deposit-animation">
+                            <div class="deposit-slot">
+                                <div class="cash-stack">
+                                    <div class="cash-note">₦1000</div>
+                                    <div class="cash-note">₦500</div>
+                                    <div class="cash-note">₦200</div>
+                                </div>
+                                <div class="deposit-arrow">
+                                    <i class="fas fa-arrow-down"></i>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="amount-display">
+                            <div class="amount-input">
+                                <span class="currency">₦</span>
+                                <input type="text" id="depositAmount" value="0" readonly>
+                            </div>
+                            <div class="amount-voice-feedback" id="depositFeedback">
+                                <i class="fas fa-wave-square"></i>
+                                <span>Say amount like "Two Thousand Five Hundred"</span>
+                            </div>
+                        </div>
+
+                        <div class="deposit-limits">
+                            <div class="limit">
+                                <i class="fas fa-arrow-up"></i>
+                                <span>Maximum: ₦500,000</span>
+                            </div>
+                            <div class="limit">
+                                <i class="fas fa-arrow-down"></i>
+                                <span>Minimum: ₦100</span>
+                            </div>
+                        </div>
+
+                        <div class="transaction-actions">
+                            <div class="voice-action" data-command="confirm">
+                                <div class="action-icon">
+                                    <i class="fas fa-check-circle"></i>
+                                </div>
+                                <p>Say <span class="command">"CONFIRM"</span> to deposit</p>
+                            </div>
+                            <div class="voice-action" data-command="cancel">
+                                <div class="action-icon">
+                                    <i class="fas fa-times-circle"></i>
+                                </div>
+                                <p>Say <span class="command">"CANCEL"</span> to go back</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Balance Screen -->
+                    <div class="screen balance-screen" id="balanceScreen">
+                        <h3><i class="fas fa-balance-scale"></i> Account Balance</h3>
+                        
+                        <div class="balance-display">
+                            <div class="balance-amount">
+                                <span class="currency">₦</span>
+                                <span id="balanceAmount" class="animate__animated">50,000</span>
+                            </div>
+                            <div class="balance-details">
+                                <div class="detail">
+                                    <i class="fas fa-calendar-check"></i>
+                                    <span>Last updated: <strong id="lastUpdate">Just now</strong></span>
+                                </div>
+                                <div class="detail">
+                                    <i class="fas fa-clock"></i>
+                                    <span>Available for withdrawal immediately</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="balance-actions">
+                            <div class="voice-action" data-command="menu">
+                                <div class="action-icon">
+                                    <i class="fas fa-arrow-left"></i>
+                                </div>
+                                <p>Say <span class="command">"MENU"</span> to go back</p>
+                            </div>
+                            <div class="voice-action" data-command="repeat">
+                                <div class="action-icon">
+                                    <i class="fas fa-redo"></i>
+                                </div>
+                                <p>Say <span class="command">"REPEAT"</span> to hear balance</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Transaction History Screen -->
+                    <div class="screen history-screen" id="historyScreen">
+                        <h3><i class="fas fa-history"></i> Transaction History</h3>
+                        
+                        <div class="history-list" id="historyList">
+                            <!-- History items will be populated by JavaScript -->
+                        </div>
+
+                        <div class="history-actions">
+                            <div class="voice-action" data-command="menu">
+                                <div class="action-icon">
+                                    <i class="fas fa-arrow-left"></i>
+                                </div>
+                                <p>Say <span class="command">"MENU"</span> to go back</p>
+                            </div>
+                            <div class="voice-action" data-command="clear history">
+                                <div class="action-icon">
+                                    <i class="fas fa-trash"></i>
+                                </div>
+                                <p>Say <span class="command">"CLEAR HISTORY"</span> to delete</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Result Screen -->
+                    <div class="screen result-screen" id="resultScreen">
+                        <div class="result-icon" id="resultIcon">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <h3 id="resultTitle">Transaction Successful</h3>
+                        <div class="result-message" id="resultMessage">
+                            Your withdrawal of ₦5,000 was successful.
+                        </div>
+                        <div class="result-details" id="resultDetails">
+                            <div class="detail">
+                                <span>New Balance:</span>
+                                <strong>₦45,000</strong>
+                            </div>
+                            <div class="detail">
+                                <span>Transaction ID:</span>
+                                <strong>TX-789456</strong>
+                            </div>
+                            <div class="detail">
+                                <span>Time:</span>
+                                <strong>14:30 PM</strong>
+                            </div>
+                        </div>
+
+                        <div class="result-actions">
+                            <div class="voice-action" data-command="menu">
+                                <div class="action-icon">
+                                    <i class="fas fa-arrow-left"></i>
+                                </div>
+                                <p>Say <span class="command">"MENU"</span> for more transactions</p>
+                            </div>
+                            <div class="voice-action" data-command="exit">
+                                <div class="action-icon">
+                                    <i class="fas fa-sign-out-alt"></i>
+                                </div>
+                                <p>Say <span class="command">"EXIT"</span> to end session</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Voice Control Panel -->
+                <div class="voice-control-panel">
+                    <div class="control-buttons">
+                        <button class="control-btn" id="toggleVoice">
+                            <i class="fas fa-microphone"></i>
+                            <span>Voice Control</span>
+                        </button>
+                        <button class="control-btn" id="repeatBtn">
+                            <i class="fas fa-redo"></i>
+                            <span>Repeat</span>
+                        </button>
+                        <button class="control-btn" id="helpBtn">
+                            <i class="fas fa-question-circle"></i>
+                            <span>Help</span>
+                        </button>
+                        <button class="control-btn" id="settingsBtn">
+                            <i class="fas fa-cog"></i>
+                            <span>Settings</span>
+                        </button>
+                    </div>
+                    <div class="volume-control">
+                        <i class="fas fa-volume-up"></i>
+                        <input type="range" id="volumeSlider" min="0" max="100" value="80">
+                    </div>
+                </div>
+            </div>
+
+            <!-- ATM Physical Elements -->
+            <div class="atm-body">
+                <div class="card-slot-real">
+                    <div class="slot-opening"></div>
+                    <div class="card-eject" id="cardEject">
+                        <i class="fas fa-eject"></i>
+                    </div>
+                </div>
+                <div class="cash-dispenser">
+                    <div class="cash-outlet"></div>
+                    <div class="cash-tray">
+                        <div class="cash-notes">
+                            <div class="cash">₦</div>
+                            <div class="cash">₦</div>
+                            <div class="cash">₦</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="branding">
+                    <div class="tagline">Voice-Controlled Accessibility</div>
+                    <div class="compliance">
+                        <i class="fas fa-universal-access"></i>
+                        <span>ADA Compliant</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Settings Modal -->
+        <div class="settings-modal" id="settingsModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3><i class="fas fa-cog"></i> Accessibility Settings</h3>
+                    <button class="close-modal" id="closeSettings">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="setting-option">
+                        <div class="setting-info">
+                            <h4>Voice Speed</h4>
+                            <p>Adjust how fast the voice speaks</p>
+                        </div>
+                        <div class="setting-control">
+                            <input type="range" id="voiceSpeed" min="0.5" max="2" step="0.1" value="1">
+                            <span id="speedValue">Normal</span>
+                        </div>
+                    </div>
+                    <div class="setting-option">
+                        <div class="setting-info">
+                            <h4>High Contrast Mode</h4>
+                            <p>Increase contrast for better visibility</p>
+                        </div>
+                        <div class="setting-control">
+                            <label class="switch">
+                                <input type="checkbox" id="highContrast">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="setting-option">
+                        <div class="setting-info">
+                            <h4>Large Text Mode</h4>
+                            <p>Increase text size for readability</p>
+                        </div>
+                        <div class="setting-control">
+                            <label class="switch">
+                                <input type="checkbox" id="largeText">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="setting-option">
+                        <div class="setting-info">
+                            <h4>Audio Confirmation</h4>
+                            <p>Play sounds for actions</p>
+                        </div>
+                        <div class="setting-control">
+                            <label class="switch">
+                                <input type="checkbox" id="audioConfirm" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="setting-option">
+                        <div class="setting-info">
+                            <h4>Voice Gender</h4>
+                            <p>Choose preferred voice</p>
+                        </div>
+                        <div class="setting-control">
+                            <select id="voiceGender">
+                                <option value="female">Female Voice</option>
+                                <option value="male">Male Voice</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn-secondary" id="resetSettings">Reset to Default</button>
+                    <button class="btn-primary" id="saveSettings">Save Settings</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Audio Elements -->
+    <audio id="beepSound" src="https://assets.mixkit.co/sfx/preview/mixkit-select-click-1109.mp3"></audio>
+    <audio id="confirmSound" src="https://assets.mixkit.co/sfx/preview/mixkit-correct-answer-tone-2870.mp3"></audio>
+    <audio id="errorSound" src="https://assets.mixkit.co/sfx/preview/mixkit-wrong-answer-fail-notification-946.mp3"></audio>
+    <audio id="cashSound" src="https://assets.mixkit.co/sfx/preview/mixkit-cash-machine-printing-receipt-2716.mp3"></audio>
+    <audio id="cardSound" src="https://assets.mixkit.co/sfx/preview/mixkit-plastic-bag-click-1125.mp3"></audio>
+
+    <!-- Scripts -->
+    <script src="voice-control.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
